@@ -26,22 +26,23 @@
                 <!-- Reporte PDF -->
                 <div class="col-md-6 text-center mb-3">
                     <h3>Reporte 1 (PDF)</h3>
-                    <a href="../Servidor/reportepdfUsu.php"><img src="img/pdf_Icon.png" height="200px"
-                            width="200px"></a>
-
+                    <a href="../Servidor/reportepdfUsu.php">
+                        <img src="img/pdf_Icon.png" height="200px" width="200px" alt="PDF">
+                    </a>
                 </div>
                 <!-- Reporte Excel -->
                 <div class="col-md-6 text-center mb-3">
                     <h3>Reporte 2 (Excel)</h3>
-                    <a href="../Servidor/reporteExcelUsu.php"><img src="img/Excel_Icon.png" height="200px"
-                            width="200px"></a>
-
+                    <a href="../Servidor/reporteexcelUsu.php">
+                        <img src="img/Excel_Icon.png" height="200px" width="200px" alt="Excel">
+                    </a>
                 </div>
             </div>
         </div>
 
         <?php include("include/pie.php"); ?>
     </div>
+
 
 </body>
 
