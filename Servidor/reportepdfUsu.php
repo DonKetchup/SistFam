@@ -8,8 +8,8 @@ require(__DIR__ . '/../Cliente/lib/fpdf/fpdf.php');
 class PDF extends FPDF {
     // Método header() que se llama al principio de cada página del PDF
     function Header() {
-        // Añadir una imagen al encabezado - skip if image doesn't exist
-        $logoPath = __DIR__ . '/../Cliente/img/logo.png';
+        // Añadir una imagen al encabezado
+        $logoPath = __DIR__ . '/../Cliente/img/NOREVA.png';
         if (file_exists($logoPath)) {
             $this->Image($logoPath, 10, 8, 33);
         }

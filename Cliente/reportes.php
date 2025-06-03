@@ -21,12 +21,32 @@
         </header>
 
         <div class="container mt-4">
-            <h2 class="text-center mb-4">Reportes</h2>
+            <h2 class="text-center mb-4">Reportes de Usuarios</h2>
             <div class="row justify-content-center">
                 <!-- Reporte PDF -->
                 <div class="col-md-6 text-center mb-3">
                     <h3>Reporte 1 (PDF)</h3>
                     <a href="../Servidor/reportepdfUsu.php">
+                        <img src="img/pdf_Icon.png" height="200px" width="200px" alt="PDF">
+                    </a>
+                </div>
+                <!-- Reporte Excel -->
+                <div class="col-md-6 text-center mb-3">
+                    <h3>Reporte 2 (Excel)</h3>
+                    <a href="../Servidor/reporteexcelUsu.php">
+                        <img src="img/Excel_Icon.png" height="200px" width="200px" alt="Excel">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mt-4">
+            <h2 class="text-center mb-4">Reporte de Productos</h2>
+            <div class="row justify-content-center">
+                <!-- Reporte PDF -->
+                <div class="col-md-6 text-center mb-3">
+                    <h3>Reporte 1 (PDF)</h3>
+                    <a href="../Servidor/reportepdfProductos.php">
                         <img src="img/pdf_Icon.png" height="200px" width="200px" alt="PDF">
                     </a>
                 </div>

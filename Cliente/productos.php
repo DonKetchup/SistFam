@@ -1,112 +1,122 @@
 <?php
-// Conexión a la base de datos
 include("../Servidor/config/config.php");
 $conexion = dbConectar();
+
+// Obtener categorías para el select
+$categorias = [];
+$sqlCat = "SELECT catcve, catnom FROM categoria";
+$resCat = $conexion->query($sqlCat);
+if ($resCat) {
+    while ($fila = $resCat->fetch_assoc()) {
+        $categorias[] = $fila;
+    }
+}
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Usuarios</title>
-    <link rel="stylesheet" href="css/estilo2.css">
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <title>Gestión de Productos</title>
+    <link rel="stylesheet" href="css/estilo2.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 </head>
 
 <body>
-    <!--incluimos el menu general -->
-    <?php include("include/menu.php");?>
+    <?php include("include/menu.php"); ?>
     <div class="main-content">
         <header>
-            <h1>Sistema de Gestión de SPA</h1>
-            <div class="content">
-                <!-- Formulario -->
-                <form id="registroForm" method="post" action="../servidor/insertarUsu.php">
-                    <div style="text-align: center;">
-                        <h2>Registro de Usuario</h2>
-                    </div>
-                    <input type="text" id="nombre" name="nombre" placeholder="Nombre(s)" required>
-                    <input type="text" id="apa" name="apa" placeholder="Apellido Paterno" required>
-                    <input type="text" id="ama" name="ama" placeholder="Apellido Materno" required>
-                    <input type="email" id="correo" name="correo" placeholder="Correo electrónico" required>
-                    <input type="text" id="telefono" name="telefono" placeholder="Teléfono (10 dígitos)"
-                        pattern="\d{10}" required>
-                    <input type="password" id="pass" name="pass" placeholder="Contraseña (mín. 6 caracteres)"
-                        minlength="6" required>
-                    <select id="idtipo" name="idtipo" required>
-                        <option value="">Selecciona tipo de usuario</option>
-                        <?php foreach($tipos as $tipo): ?>
-                        <option value="<?php echo $tipo['idtipo']; ?>"><?php echo htmlspecialchars($tipo['tipo']); ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <button type="submit">Registrar</button>
-                </form>
+            <h1>Sistema de Gestión de Productos</h1>
+        </header>
+        <div class="content">
+            <!-- Formulario para registrar producto -->
+            <form id="registroProductoForm" method="post" action="../Servidor/insertarProducto.php"
+                enctype="multipart/form-data">
+                <h2>Registro de Producto</h2>
+                <input type="text" name="procod" placeholder="Código del producto" maxlength="20" required />
+                <input type="text" name="pronom" placeholder="Nombre" maxlength="100" required />
+                <input type="text" name="prodes" placeholder="Descripción" maxlength="250" />
+                <input type="number" name="procos" step="0.01" placeholder="Costo" required />
+                <input type="file" name="proimg" accept="image/*" />
+                <select name="catcve" required>
+                    <option value="">Selecciona categoría</option>
+                    <?php foreach ($categorias as $cat): ?>
+                    <option value="<?php echo $cat['catcve']; ?>"><?php echo htmlspecialchars($cat['catnom']); ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+                <select name="proest" required>
+                    <option value="">Selecciona estado</option>
+                    <option value="1">Activo</option>
+                    <option value="0">Inactivo</option>
+                </select>
+                <button type="submit">Registrar Producto</button>
+            </form>
 
-                <!-- Tabla de usuarios -->
-                <h2 class="text-center mt-4">Usuarios Registrados</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle" style="color:black">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Apellido Paterno</th>
-                                <th>Apellido Materno</th>
-                                <th>Correo</th>
-                                <th>Teléfono</th>
-                                <th>Tipo</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-          $sqlUsuarios = "SELECT u.idusuario, u.nombre, u.apaterno, u.amaterno, u.correo, u.telefono, t.tipo 
-                          FROM usuarios u 
-                          INNER JOIN tipo t ON u.idtipo = t.idtipo";
-          $resUsuarios = $conexion->query($sqlUsuarios);
-          if ($resUsuarios && $resUsuarios->num_rows > 0):
-            while ($usu = $resUsuarios->fetch_assoc()):
+            <!-- Tabla de productos -->
+            <h2 class="mt-4">Productos Registrados</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle" style="color:black">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Costo</th>
+                            <th>Imagen</th>
+                            <th>Categoría</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+          $sqlProductos = "SELECT p.procod, p.pronom, p.prodes, p.procos, p.proimg, c.catcve, p.proest 
+                      FROM producto p
+                      LEFT JOIN categoria c ON p.catcve = c.catcve";
+          $resProd = $conexion->query($sqlProductos);
+          if ($resProd && $resProd->num_rows > 0):
+            while ($prod = $resProd->fetch_assoc()):
           ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($usu['nombre']); ?></td>
-                                <td><?php echo htmlspecialchars($usu['apaterno']); ?></td>
-                                <td><?php echo htmlspecialchars($usu['amaterno']); ?></td>
-                                <td><?php echo htmlspecialchars($usu['correo']); ?></td>
-                                <td><?php echo htmlspecialchars($usu['telefono']); ?></td>
-                                <td><?php echo htmlspecialchars($usu['tipo']); ?></td>
-                                <td>
-                                    <!-- Button trigger modal -->
-                                    <button class="btn btn-sm btn-warning" type="button" data-bs-toggle="modal"
-                                        data-bs-target="#modalEditar" onclick="cargarDatosEditar(
-    <?php echo $usu['idusuario']; ?>,
-    '<?php echo htmlspecialchars($usu['nombre'], ENT_QUOTES); ?>',
-    '<?php echo htmlspecialchars($usu['apaterno'], ENT_QUOTES); ?>',
-    '<?php echo htmlspecialchars($usu['amaterno'], ENT_QUOTES); ?>',
-    '<?php echo htmlspecialchars($usu['correo'], ENT_QUOTES); ?>',
-    '<?php echo htmlspecialchars($usu['telefono'], ENT_QUOTES); ?>'
-  )">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger"
-                                        onclick="eliminarUsuario(<?php echo $usu['idusuario']; ?>)">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <?php endwhile; else: ?>
-                            <tr>
-                                <td colspan="7" class="text-center">No hay usuarios registrados.</td>
-                            </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-
+                        <tr>
+                            <td><?php echo htmlspecialchars($prod['procod']); ?></td>
+                            <td><?php echo htmlspecialchars($prod['pronom']); ?></td>
+                            <td><?php echo htmlspecialchars($prod['prodes']); ?></td>
+                            <td><?php echo number_format($prod['procos'], 2); ?></td>
+                            <td>
+                                <?php if ($prod['proimg']): ?>
+                                <img src="../img_productos/<?php echo htmlspecialchars($prod['proimg']); ?>"
+                                    alt="Imagen" width="50" />
+                                <?php else: ?>
+                                Sin imagen
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo htmlspecialchars($cat['catnom']); ?></td>
+                            <td><?php echo $prod['proest'] == 1 ? 'Activo' : 'Inactivo'; ?></td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" type="button" data-bs-toggle="modal"
+                                    data-bs-target="#modalEditarProducto"
+                                    onclick="cargarDatosEditarProducto('<?php echo addslashes($prod['procod']); ?>', '<?php echo addslashes($prod['pronom']); ?>', '<?php echo addslashes($prod['prodes']); ?>', '<?php echo $prod['procos']; ?>', '<?php echo addslashes($prod['proimg']); ?>', '<?php echo $prod['catcve']; ?>', '<?php echo $prod['proest']; ?>')">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger"
+                                    onclick="eliminarProducto('<?php echo $prod['procod']; ?>')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <?php endwhile; else: ?>
+                        <tr>
+                            <td colspan="8" class="text-center">No hay productos registrados.</td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
-            <?php include("include/pie.php");?>
+        </div>
+
+        <?php include("include/pie.php"); ?>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -114,7 +124,7 @@ $conexion = dbConectar();
     <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-        function eliminarUsuario(id) {
+        window.eliminarProducto = function(procod) {
             Swal.fire({
                 title: '¿Estás seguro?',
                 text: "¡No podrás revertir esto!",
@@ -126,102 +136,65 @@ $conexion = dbConectar();
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('../Servidor/eliminarUsu.php', {
+                    fetch('../Servidor/eliminarProducto.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                id: id
+                                procod: procod
                             })
                         })
-                        .then(response => response.json())
+                        .then(res => res.json())
                         .then(data => {
                             if (data.success) {
-                                Swal.fire('¡Eliminado!', 'El usuario ha sido eliminado.', 'success')
+                                Swal.fire('¡Eliminado!', 'El producto ha sido eliminado.',
+                                        'success')
                                     .then(() => location.reload());
                             } else {
-                                Swal.fire('Error', 'No se pudo eliminar el usuario.', 'error');
+                                Swal.fire('Error', 'No se pudo eliminar el producto.', 'error');
                             }
                         });
                 }
             });
-        }
+        };
 
-        window.eliminarUsuario = eliminarUsuario;
+        window.cargarDatosEditarProducto = function(procod, pronom, prodes, procos, proimg, catcve, proest) {
+            document.getElementById('edit-procod').value = procod;
+            document.getElementById('edit-pronom').value = pronom;
+            document.getElementById('edit-prodes').value = prodes;
+            document.getElementById('edit-procos').value = procos;
+            // Aquí puedes agregar selects para categoría y estado si deseas
+        };
 
-        window.cargarDatosEditar = function(id, nombre, apa, ama, correo, telefono) {
-            document.getElementById('edit-idusuario').value = id;
-            document.getElementById('edit-nombre').value = nombre;
-            document.getElementById('edit-apa').value = apa;
-            document.getElementById('edit-ama').value = ama;
-            document.getElementById('edit-correo').value = correo;
-            document.getElementById('edit-telefono').value = telefono;
-        }
-
-        document.getElementById('formEditarUsuario').onsubmit = function(e) {
-            e.preventDefault();
-
-            const datos = {
-                id: document.getElementById('edit-idusuario').value,
-                nombre: document.getElementById('edit-nombre').value,
-                apa: document.getElementById('edit-apa').value,
-                ama: document.getElementById('edit-ama').value,
-                correo: document.getElementById('edit-correo').value,
-                telefono: document.getElementById('edit-telefono').value
-            };
-            fetch('../Servidor/actualizarUsu.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(datos)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire('¡Actualizado!', 'El usuario ha sido actualizado.', 'success')
-                            .then(() => {
-                                location.reload();
-                            });
-                    } else {
-                        Swal.fire('Error', 'No se pudo actualizar el usuario.', 'error');
-                    }
-                });
-        }
     });
     </script>
 
-    <!-- Modal para Editar Usuario -->
-    <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+    <!-- Modal para Editar Producto -->
+    <div class="modal fade" id="modalEditarProducto" tabindex="-1" aria-labelledby="modalEditarProductoLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
-            <form id="formEditarUsuario" class="modal-content">
+            <form id="formEditarProducto" class="modal-content" method="post"
+                action="../Servidor/actualizarProducto.php" enctype="multipart/form-data">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalEditarLabel">Editar Usuario</h5>
+                    <h5 class="modal-title" id="modalEditarProductoLabel">Editar Producto</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="edit-idusuario" name="idusuario">
+                    <input type="hidden" id="edit-procod" name="procod" />
                     <div class="mb-3">
-                        <label for="edit-nombre" class="form-label">Nombre</label>
-                        <input type="text" class="form-control" id="edit-nombre" name="nombre" required>
+                        <label for="edit-pronom" class="form-label">Nombre</label>
+                        <input type="text" id="edit-pronom" name="pronom" class="form-control" required />
                     </div>
                     <div class="mb-3">
-                        <label for="edit-apa" class="form-label">Apellido Paterno</label>
-                        <input type="text" class="form-control" id="edit-apa" name="apa" required>
+                        <label for="edit-prodes" class="form-label">Descripción</label>
+                        <input type="text" id="edit-prodes" name="prodes" class="form-control" />
                     </div>
                     <div class="mb-3">
-                        <label for="edit-ama" class="form-label">Apellido Materno</label>
-                        <input type="text" class="form-control" id="edit-ama" name="ama" required>
+                        <label for="edit-procos" class="form-label">Costo</label>
+                        <input type="number" step="0.01" id="edit-procos" name="procos" class="form-control" required />
                     </div>
-                    <div class="mb-3">
-                        <label for="edit-correo" class="form-label">Correo</label>
-                        <input type="email" class="form-control" id="edit-correo" name="correo" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-telefono" class="form-label">Teléfono</label>
-                        <input type="text" class="form-control" id="edit-telefono" name="telefono" required>
-                    </div>
+                    <!-- Aquí puedes agregar selects para categoría y estado si deseas -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -230,7 +203,6 @@ $conexion = dbConectar();
             </form>
         </div>
     </div>
-
 
 </body>
 

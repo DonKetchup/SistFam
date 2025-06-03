@@ -1,25 +1,30 @@
-<?php 
+<?php
 include_once 'config/config.php';
 
-$conexion = dbConectar(); // <-- Agrega esta línea
+$conexion = dbConectar();
 
-$c1 = $_POST['nombre'];
-$c2 = $_POST['apa'];
-$c3 = $_POST['ama'];
-$c4 = $_POST['correo'];
-$c5 = $_POST['telefono'];
-$c6 = $_POST['pass'];
+$procod = $_POST['procod'];        // varchar(20)
+$pronom = $_POST['pronom'];        // varchar(100)
+$prodes = $_POST['prodes'];        // varchar(250)
+$procos = $_POST['procos'];        // double(8,2)
+$catcve = $_POST['catcve'];        // int
+$proest = $_POST['proest'];        // int (0 o 1)
 
+// No subes imágenes, se guarda NULL
+$proimg = null;
 
-// Sentencia para evitar inyección SQL
 $sql = $conexion->prepare("INSERT INTO producto(procod, pronom, prodes, procos, proimg, catcve, proest) VALUES (?, ?, ?, ?, ?, ?, ?)");
-$sql->bind_param("issii", $c1, $c2, $c3, $c4, $c5, $c6, $c7);
-$sql->execute();
-$sql->close();
+$sql->bind_param("sssdisi", $procod, $pronom, $prodes, $procos, $proimg, $catcve, $proest);
 
-// Redireccionar a la página de inicio
-header("Location:../Cliente/usuarios.php");
-
-// Cerrar la conexión
-$conexion->close();
+if($sql->execute()){
+    $sql->close();
+    $conexion->close();
+    header("Location: ../Cliente/productos.php");
+    exit();
+} else {
+    $error = $conexion->error;
+    $sql->close();
+    $conexion->close();
+    die("Error al insertar el producto: " . $error);
+}
 ?>

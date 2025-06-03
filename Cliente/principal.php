@@ -16,7 +16,7 @@
         <header>
             <h1>Sistema de Gestión de SPA</h1>
             <div class="content">
-                <img src="img/foto.jpg" height="300px" width="350px">
+                <img src="img/NOREVA.png" height="300px" width="350px">
             </div>
             <?php include("include/pie.php");?>
     </div>
